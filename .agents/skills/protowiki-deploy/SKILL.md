@@ -44,8 +44,9 @@ The build:
    `_plugin-vue_export-helper-….js`).
 4. Copies **`public/404.html`** (redirect script) to `dist/404.html`. GitHub
    only reads **root** `404.html`; it redirects deep links (including
-   `/pr-preview/pr-N/…`) to `?/route` under the right base. `main.ts` calls
-   `restoreGithubPagesSpaUrl()` before the router starts.
+   `/pr-preview/pr-N/…`) to `?/route` under the right base. **`public/gh-pages-restore.js`**
+   is injected at the top of `<head>` on build (before the Vite bundle); `main.ts`
+   restores again and calls `router.replace()` as a backup.
 
 ## Base path
 
@@ -154,6 +155,10 @@ into review tickets to pin a specific preview.
   does not). Same root `404.html` must be on `gh-pages` from a recent **main**
   deploy; preview-only deploys do not update it. Push to `main`, then hard-refresh
   the preview deep link (one redirect via `?/…` is expected).
+- **Preview deep link shows the gallery** (`?template-…` in the URL). The
+  restore script in `index.html` did not run or is outdated — redeploy `main`
+  (includes inline restore + `public/404.html`). After redirect, the URL should
+  be `…/pr-N/template-…`, not `…/pr-N?template-…`.
 - **Asset URLs missing the base path.** Check `import.meta.env.BASE_URL`
   matches the deployed URL prefix; the router uses it.
 - **Blank app on Pages or preview.** Wrong `PROTOWIKI_BASE` (missing repo

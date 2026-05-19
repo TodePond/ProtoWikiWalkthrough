@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
@@ -9,6 +10,11 @@ import vue from '@vitejs/plugin-vue'
 // matches your routes (blank app). CI sets PROTOWIKI_BASE from the repo name.
 // Override locally, e.g. PROTOWIKI_BASE='/ProtoWiki/' npm run build
 const buildBase = process.env.PROTOWIKI_BASE ?? '/protowiki/'
+
+const ghPagesRestoreScript = readFileSync(
+  new URL('./public/gh-pages-restore.js', import.meta.url),
+  'utf8',
+)
 
 export default defineConfig(({ command }) => ({
   base: command === 'build' ? buildBase : '/',
@@ -26,9 +32,25 @@ export default defineConfig(({ command }) => ({
       dts: 'src/typed-router.d.ts',
     }),
     vue(),
+    // Run before Vite hoists the module script into <head>.
+    {
+      name: 'protowiki-gh-pages-restore',
+      apply: 'build',
+      transformIndexHtml: {
+        order: 'pre',
+        handler() {
+          return [
+            {
+              tag: 'script',
+              children: ghPagesRestoreScript,
+              injectTo: 'head-prepend',
+            },
+          ]
+        },
+      },
+    },
     // Root SPA fallback: public/404.html (redirect script) is copied to dist/.
-    // restoreGithubPagesSpaUrl() in main.ts completes the flow for prod and
-    // /pr-preview/pr-N/ deep links. Do not overwrite 404.html with index.html.
+    // restoreGithubPagesSpaRedirect in main.ts is a backup after the bundle loads.
   ],
   resolve: {
     alias: {

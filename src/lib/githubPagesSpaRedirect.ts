@@ -1,23 +1,39 @@
 /**
- * Restore the real path after the root 404.html redirect used on GitHub Pages
- * (/?/route → /route under import.meta.env.BASE_URL). See public/404.html.
+ * Restore the real path after the root 404.html redirect used on GitHub Pages.
+ * Logic matches https://github.com/rafgraph/spa-github-pages (index.html script).
+ * Also runs from main.ts; index.html inlines the same script before the Vite bundle.
  */
 export function restoreGithubPagesSpaUrl(): void {
-  const { search, hash } = window.location
-  if (!search.startsWith('?/') && !search.startsWith('?%2F')) {
+  const l = window.location
+  const { search, pathname, hash } = l
+
+  if (search.length > 1 && search[1] === '/') {
+    const decoded = search
+      .slice(1)
+      .split('&')
+      .map((s) => s.replace(/~and~/g, '&'))
+      .join('?')
+    const basePath = pathname.endsWith('/') ? pathname.slice(0, -1) : pathname
+    l.replaceState(null, '', basePath + decoded + hash)
     return
   }
 
-  let routePath = search.slice(2).replace(/~and~/g, '&')
-  const amp = routePath.indexOf('&')
-  if (amp > -1) {
-    routePath = routePath.slice(0, amp)
+  // Some Pages loads drop the slash after `?` (?route instead of ?/route).
+  if (search.length > 1 && search[1] !== '/' && !search.includes('=')) {
+    const basePath = pathname.endsWith('/') ? pathname.slice(0, -1) : pathname
+    l.replaceState(null, '', `${basePath}/${search.slice(1)}${hash}`)
   }
-  routePath = decodeURIComponent(routePath).replace(/^\//, '')
+}
 
-  const base = import.meta.env.BASE_URL
-  const normalizedBase = base.endsWith('/') ? base : `${base}/`
-  const target = normalizedBase + routePath + hash
-
-  window.history.replaceState(null, '', target)
+/** Path under import.meta.env.BASE_URL after restore (e.g. `/template-chrome`). */
+export function githubPagesSubpathAfterBase(baseUrl: string): string | null {
+  const basePrefix = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl
+  let subPath = window.location.pathname
+  if (basePrefix && subPath.startsWith(basePrefix)) {
+    subPath = subPath.slice(basePrefix.length)
+  }
+  if (!subPath || subPath === '/') {
+    return null
+  }
+  return subPath.startsWith('/') ? subPath : `/${subPath}`
 }

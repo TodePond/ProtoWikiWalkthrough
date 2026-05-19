@@ -11,7 +11,10 @@ import './styles/wiki-content/minerva.css'
 import './styles/wiki-content/mobile-wiki-overrides.css'
 import './styles/dark.css'
 
-import { restoreGithubPagesSpaUrl } from './lib/githubPagesSpaRedirect'
+import {
+  githubPagesSubpathAfterBase,
+  restoreGithubPagesSpaUrl,
+} from './lib/githubPagesSpaRedirect'
 import { initTheming } from './lib/theming'
 
 restoreGithubPagesSpaUrl()
@@ -21,6 +24,11 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
+
+const subPath = githubPagesSubpathAfterBase(import.meta.env.BASE_URL)
+if (subPath) {
+  void router.replace(subPath)
+}
 
 if (import.meta.hot) {
   handleHotUpdate(router)
