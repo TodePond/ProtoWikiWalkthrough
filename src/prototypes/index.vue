@@ -88,6 +88,7 @@ const showBucketDivider = computed(
 </script>
 
 <template>
+  <!--  -->
   <PlainWrapper heading="ProtoWiki">
     <div class="prototype-index">
       <div class="prototype-index__list">
