@@ -13,8 +13,10 @@ import { CdxButton, CdxCard, CdxIcon, CdxPopover, CdxSelect } from '@wikimedia/c
 import { cdxIconSettings } from '@wikimedia/codex-icons'
 
 import PlainWrapper from '@/components/PlainWrapper.vue'
+import { useConfig } from '@/composables/useConfig'
 
 const router = useRouter()
+const { theme, user } = useConfig()
 
 interface PrototypeMeta {
   title?: string
@@ -89,11 +91,17 @@ const showBucketDivider = computed(
 
 const settingsOpen = ref(false)
 const settingsAnchor = ref<HTMLElement | null>(null)
-const settingsChoice = ref<string | null>(null)
 
-const settingsMenuItems = [
-  { value: 'a', label: 'Option A' },
-  { value: 'b', label: 'Option B' },
+const themeMenuItems = [
+  { value: 'system', label: 'System' },
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+]
+
+const userMenuItems = [
+  { value: 'logged-out', label: 'Logged out' },
+  { value: 'new', label: 'New editor' },
+  { value: 'experienced', label: 'Experienced editor' },
 ]
 </script>
 
@@ -120,11 +128,22 @@ const settingsMenuItems = [
         class="prototype-index__settings-popover"
       >
         <div class="prototype-index__settings-panel" @click.stop>
-          <CdxSelect
-            v-model:selected="settingsChoice"
-            :menu-items="settingsMenuItems"
-            default-label="Choose an option"
-          />
+          <label class="prototype-index__settings-field">
+            <span class="prototype-index__settings-label">Theme</span>
+            <CdxSelect
+              v-model:selected="theme"
+              :menu-items="themeMenuItems"
+              default-label="System"
+            />
+          </label>
+          <label class="prototype-index__settings-field">
+            <span class="prototype-index__settings-label">User</span>
+            <CdxSelect
+              v-model:selected="user"
+              :menu-items="userMenuItems"
+              default-label="Logged out"
+            />
+          </label>
         </div>
       </CdxPopover>
     </template>
@@ -169,6 +188,25 @@ const settingsMenuItems = [
   margin: var(--spacing-50) 0;
   border: 0;
   border-top: 1px solid var(--border-color-subtle);
+}
+
+.prototype-index__settings-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-100);
+  min-width: 12rem;
+}
+
+.prototype-index__settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-25);
+}
+
+.prototype-index__settings-label {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-subtle);
 }
 </style>
 
