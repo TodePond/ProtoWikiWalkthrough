@@ -1,6 +1,6 @@
 # Wrappers
 
-`ChromeWrapper`, `SpecialPageWrapper`, `PlainWrapper`.
+`ChromeWrapper`, `SpecialPageWrapper`, `PlainWrapper`, `MobileWrapper`.
 Each is a layout shell with one concern. Compose by nesting — there is no
 chrome-bundled convenience wrapper. **`ArticleLive`**, **`ArticleSnapshot`**, and **`ArticleCustom`**
 (reader surfaces) live in [`article.md`](article.md).
@@ -181,12 +181,47 @@ The **home gallery** (`src/prototypes/index.vue`) uses `PlainWrapper`.
 </PlainWrapper>
 ```
 
+## MobileWrapper
+
+Phone-frame preview shell — **not** Wikipedia chrome. Below **480px** viewport
+width the default slot is full width with no side gutters. At **480px** and up,
+the slot is centred in a **`max-width: 360px`** column; **`--background-color-neutral`**
+fills the side gutters; the column uses **`--background-color-base`** and a
+**`--border-color-muted`** side borders only (Codex light / dark).
+
+Does **not** set `data-skin` / `data-theme` — pass those on content inside the slot
+(usually **`ChromeWrapper skin="mobile"`**). **`Dashboard`** keys its mobile/desktop slots off ancestor **`data-skin`**, so pass **`skin="mobile"`** when previewing a phone layout inside this frame.
+
+### Props
+
+| Prop       | Type             | Default   | Notes                                      |
+| ---------- | ---------------- | --------- | ------------------------------------------ |
+| `maxWidth` | `string`         | `'360px'` | Centred column width when clamped (wide)   |
+| `lang`     | `string`         | `undefined` | Sets `lang` on the inner column          |
+| `dir`      | `'ltr' \| 'rtl'` | `undefined` | Sets `dir` on the inner column           |
+
+### Slots
+
+| Slot    | Use for                                      |
+| ------- | -------------------------------------------- |
+| default | Preview content (e.g. mobile-skinned chrome) |
+
+### Example
+
+```vue
+<MobileWrapper>
+  <ChromeWrapper skin="mobile" :last-edited-notice="false">
+    <ArticleLive article="Albert Einstein" />
+  </ChromeWrapper>
+</MobileWrapper>
+```
+
 ## Why these wrappers?
 
 The earlier draft of this repo had `ArticleLayout`, `ArticleBody`,
-`ArticleWrapper-with-chrome`, `MobileWrapper`, `PhoneFrame`, `SideBySide`
-and similar. They overlapped: every author had to learn which one bundled
-chrome, which one bundled columns, which one was a presentation device.
+`ArticleWrapper-with-chrome`, `PhoneFrame`, `SideBySide` and similar.
+They overlapped: every author had to learn which one bundled chrome, which
+one bundled columns, which one was a presentation device.
 
 The current set covers:
 
@@ -195,8 +230,7 @@ The current set covers:
 - special-page shell (`SpecialPageWrapper`)
 - newcomer homepage grid (`Dashboard` + `DashboardModule`; see [`dashboard.md`](dashboard.md) and **`src/prototypes/template-homepage/`**)
 - plain centred column (`PlainWrapper`)
+- mobile phone-frame preview (`MobileWrapper` + `ChromeWrapper skin="mobile"`)
 
-Everything else (mobile preview, A/B comparison, dark snippet on a light
-page) is expressed via the shared `skin` / `theme` props on those same
-components — no extra layout wrappers needed. See
-[`composition-recipes.md`](composition-recipes.md).
+A/B comparison and dark snippet on a light page use the shared `skin` /
+`theme` props on those same components. See [`composition-recipes.md`](composition-recipes.md).

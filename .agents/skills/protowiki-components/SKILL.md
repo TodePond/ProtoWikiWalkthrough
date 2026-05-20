@@ -14,7 +14,7 @@ This skill is the cross-cutting guide. Per-component depth lives in
 `references/`:
 
 - [`references/wrappers.md`](references/wrappers.md) — `ChromeWrapper`,
-  `SpecialPageWrapper`, `PlainWrapper`
+  `SpecialPageWrapper`, `PlainWrapper`, `MobileWrapper`
 - [`references/chrome-primitives.md`](references/chrome-primitives.md) —
   `ChromeHeader`, `ChromeFooter`
 - [`references/article.md`](references/article.md) — `ArticleWrapper`, `ArticleRenderer`,
@@ -35,6 +35,7 @@ This skill is the cross-cutting guide. Per-component depth lives in
 | `ChromeWrapper` | Wikipedia chrome (header + footer) around a slot | Yes | No |
 | `SpecialPageWrapper` | Special-page shell — title row + optional help/actions + content | No | No (full-width) |
 | `PlainWrapper` | Centred narrow column — no chrome (gallery / Component-style demos) | No | No |
+| `MobileWrapper` | Phone-frame preview — full width below 480px; centred column + neutral Codex gutters when clamped | No | No |
 | `ChromeHeader` | Vector-style chrome when `skin=desktop`, Minerva-style when `skin=mobile` — wordmarks, search cluster, user tools (via ChromeWrapper) | n/a | n/a |
 | `ChromeFooter` | Footer chrome (via ChromeWrapper): **desktop** Vector strip with optional mock last-edited + CC lines, or **mobile** Minerva well + optional strip | n/a | n/a |
 | `ArticleWrapper` | Reader outer **`<article>`**: always **`ArticleHeader`** + **default slot** (**main column** — usually **`ArticleRenderer`**) — no **`v-html`** by itself | No | No |
@@ -113,6 +114,7 @@ import ChromeHeader from '@/components/ChromeHeader.vue'
 import ChromeFooter from '@/components/ChromeFooter.vue'
 import SpecialPageWrapper from '@/components/SpecialPageWrapper.vue'
 import PlainWrapper from '@/components/PlainWrapper.vue'
+import MobileWrapper from '@/components/MobileWrapper.vue'
 import ArticleWrapper from '@/components/ArticleWrapper.vue'
 import ArticleRenderer from '@/components/ArticleRenderer.vue'
 import ArticleLive from '@/components/ArticleLive.vue'
@@ -133,6 +135,7 @@ The `@/` prefix resolves to `src/`.
 | `ChromeWrapper` | `lang?`, `dir?`, `skin?`, `theme?`, **`lastEditedNotice?`**, **`username?`**, **`wordmarkSrc?`**, **`taglineSrc?`**, **`mobileWordmarkSrc?`**, **`navTools?`** (`ChromeNavTool[]`, forwarded to default header) | default, `#header`, `#footer` |
 | `SpecialPageWrapper` | `title?`, **`help?`** (**`boolean`**), **`actions?`**, `lang?`, `dir?`, `skin?`, `theme?` | default, **`#header`**, **`#title`**, `#help`, `#actions` |
 | `PlainWrapper` | `heading?`, `lang?`, `dir?` | default, `#heading` |
+| `MobileWrapper` | `maxWidth?` (default `360px`), `lang?`, `dir?` | default |
 | `ChromeHeader` | `skin?`, `theme?`, **`username?`**, **`wordmarkSrc?`**, **`taglineSrc?`**, **`mobileWordmarkSrc?`**, **`navTools?`** | `#logo`, `#username`, `#nav` |
 | `ChromeFooter` | `skin?`, `theme?`, **`lastEditedNotice?`**, **`username?`** | default |
 | `ArticleWrapper` | **`title?`**, **`header?`**, **`languagesCount?`**, **`lang`**, **`dir`**, **`skin`**, **`theme`** | **default** |
@@ -143,7 +146,7 @@ The `@/` prefix resolves to `src/`.
 | `ArticleHeader` | **`title`** (required), **`languagesCount?`** (default 18), **`skin?`** | **`#title`**, emits (`languageSelect`, `languageSettingsClick`, tab/action clicks) |
 | `SearchBar` | `host?`, `placeholder?`, `limit?`, `skin?`, `theme?` | none |
 | `Dashboard` | (none) | `#banner`, `#mobile`, `#primary`, `#sidebar` |
-| `DashboardModule` | `title?`, `to?`, `cta?` | default, `#cta` |
+| `DashboardModule` | `title?`, `to?`, `cta?`, `subtle?` | default, `#cta` |
 
 ## When to reach beyond this list
 

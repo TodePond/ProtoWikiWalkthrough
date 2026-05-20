@@ -1,7 +1,25 @@
 import type { MostViewedArticle } from './ImpactModule.vue'
 
-/** App gallery home — mobile link cards navigate here for now. */
+/** App gallery home — placeholder target for other mobile link cards. */
 export const APP_HOME = '/'
+
+/** Newcomer homepage prototype route. */
+export const HOMEPAGE = '/template-homepage'
+
+/** Full-page mobile drill-down for the Your impact module. */
+export const IMPACT_PAGE = '/template-homepage/impact'
+
+/** Full-page mobile drill-down for the Get help with editing module. */
+export const HELP_PAGE = '/template-homepage/help'
+
+/** Full-page mobile drill-down for the Your mentor module. */
+export const MENTOR_PAGE = '/template-homepage/mentor'
+
+/** Mobile link-card preview copy (title is also the full-page header). */
+export const HELP_MODULE = {
+  title: 'Get help with editing',
+  summary: 'Ask the help desk or read help pages.',
+} as const
 
 export const HELP_LINKS = [
   { label: 'How to edit a page', href: '#' },
@@ -16,7 +34,7 @@ export const MENTOR = {
   name: 'Samwalton9',
   editCount: 12596,
   lastActiveDaysAgo: 451,
-  note: "This experienced user knows you're new and can help you with editing.",
+  note: 'Welcome to Wikipedia! Let me know if you have any questions',
   learnMoreHref: '#',
   conversationsHref: '#',
 } as const
@@ -84,9 +102,13 @@ export const IMPACT_DESKTOP: {
   viewAllEditsHref: '#',
 }
 
-export const MODULE = {
-  thankTitle: 'Contribute',
-  thankBody: 'No suggestions (yet)',
-  policiesTitle: 'Learn',
-  policiesBody: 'Learn how to edit Wikipedia',
+export const STRUCTURED_TASKS = {
+  currentIndex: 1,
+  totalCount: 173745,
+  articleTitle: 'Full circle ringing',
+  articleDescription: 'Method of hanging (church) bells and …',
+  /** Action API `pageimages` + `pithumbsize=96` for [[Full circle ringing]] */
+  thumbnailSrc:
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/St_Botolph%27s_Bell_Ringing.webm/120px--St_Botolph%27s_Bell_Ringing.webm.jpg',
+  taskTypeLabel: 'Find references',
 } as const

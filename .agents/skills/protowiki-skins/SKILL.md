@@ -57,17 +57,20 @@ element, locally re-skinning everything inside that subtree.
 
 ```vue
 <!-- Mobile preview embedded in an otherwise-desktop page -->
-<ChromeWrapper skin="mobile" style="max-width: 360px">
-  <ArticleLive article="Albert Einstein" />
-</ChromeWrapper>
+<MobileWrapper>
+  <ChromeWrapper skin="mobile">
+    <ArticleLive article="Albert Einstein" />
+  </ChromeWrapper>
+</MobileWrapper>
 ```
 
 When `skin` is **unset**, wrappers resolve **effective** `data-skin` from Vue
 inject (inside `ChromeWrapper`) or from global boot state on `<html>`, so
 nested previews stay consistent.
 
-This replaces the "PhoneFrame" component pattern from earlier drafts: a
-mobile preview is just `<ChromeWrapper skin="mobile" style="max-width: 360px">`.
+[`MobileWrapper`](../protowiki-components/references/wrappers.md#mobilewrapper)
+centres the column and adds neutral side gutters on wide viewports; set
+`skin="mobile"` on **`ChromeWrapper`** inside it for Minerva chrome.
 
 ## `useSkin()` — read-only hook
 

@@ -21,6 +21,8 @@ export interface MostViewedArticle {
 }
 
 interface Props {
+  /** Full-page drill-down — desktop layout without `DashboardModule` card chrome. */
+  standalone?: boolean
   to?: RouteLocationRaw
   /** When set: filled state. Also used as the views count label. */
   viewCount?: string
@@ -41,6 +43,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  standalone: false,
   to: undefined,
   viewCount: undefined,
   viewLabel: 'Views on articles you\'ve edited',
@@ -57,7 +60,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const hasContent = computed(() => !!props.viewCount)
-const isMobile = computed(() => props.to != null)
+const isMobilePreview = computed(() => !props.standalone && props.to != null)
 
 // ── Sparkline helpers ────────────────────────────────
 const W = 300
@@ -103,6 +106,7 @@ const activityBars = computed(() => {
     y: v === 0 ? BAR_H - 2 : BAR_H - (v / max) * BAR_H,
     width: Math.max(barWidth - gap, 1),
     height: v === 0 ? 2 : (v / max) * BAR_H,
+    active: v > 0,
   }))
 })
 
@@ -112,10 +116,18 @@ const recentEditCount = computed(() =>
 </script>
 
 <template>
-  <DashboardModule title="Your impact" :to="to" :cta="null">
+  <component
+    :is="standalone ? 'div' : DashboardModule"
+    :class="standalone ? 'impact-module impact-module--standalone' : undefined"
+    v-bind="
+      standalone
+        ? {}
+        : { title: 'Your impact', to, cta: null }
+    "
+  >
 
     <!-- ① Mobile filled ─────────────────────────────── -->
-    <template v-if="hasContent && isMobile">
+    <template v-if="hasContent && isMobilePreview">
       <div class="impact-module__stat-row">
         <span class="impact-module__count">{{ viewCount }}</span>
         <span class="impact-module__count-label">{{ viewLabel }}</span>
@@ -205,6 +217,7 @@ const recentEditCount = computed(() =>
                 :width="bar.width"
                 :height="bar.height"
                 class="impact-module__activity-bar"
+                :class="{ 'impact-module__activity-bar--active': bar.active }"
               />
             </svg>
             <div v-if="activityStartDate || activityEndDate" class="impact-module__activity-dates">
@@ -263,7 +276,7 @@ const recentEditCount = computed(() =>
     </template>
 
     <!-- ③ Mobile empty ──────────────────────────────── -->
-    <template v-else-if="isMobile">
+    <template v-else-if="isMobilePreview">
       <div class="impact-module__empty-hero">
         <img
           src="https://en.wikipedia.org/w/extensions/GrowthExperiments/images/intro-heart-article.png?269e6"
@@ -319,10 +332,16 @@ const recentEditCount = computed(() =>
       </p>
     </template>
 
-  </DashboardModule>
+  </component>
 </template>
 
 <style scoped>
+.impact-module--standalone {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
 /* ── Shared: sparkline ────────────────────────────── */
 .impact-module__sparkline {
   display: block;
@@ -509,6 +528,10 @@ const recentEditCount = computed(() =>
 
 .impact-module__activity-bar {
   fill: var(--background-color-interactive, #eaecf0);
+}
+
+.impact-module__activity-bar--active {
+  fill: var(--border-color-progressive, #36c);
 }
 
 .impact-module__activity-dates {

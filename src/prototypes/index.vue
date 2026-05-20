@@ -39,6 +39,12 @@ function humanize(path: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
+/** Top-level prototype only (src/prototypes/name/index.vue), not nested subfolder indexes. */
+function isTopLevelPrototypePath(path: string): boolean {
+  const segments = path.replace(/^\/|\/$/g, '').split('/').filter(Boolean)
+  return segments.length === 1
+}
+
 /** Bucket from `definePage` title — `Template:` / `Example:` prefixes (case-insensitive). */
 function prototypeBucket(title: string): 'regular' | 'template' | 'example' {
   const t = title.trim()
@@ -57,6 +63,7 @@ const prototypes = computed<PrototypeEntry[]>(() => {
   return router
     .getRoutes()
     .filter((route) => route.path !== '/' && route.path !== '/:catchAll(.*)')
+    .filter((route) => isTopLevelPrototypePath(route.path))
     .map((route) => {
       const meta = (route.meta ?? {}) as PrototypeMeta
       const description =

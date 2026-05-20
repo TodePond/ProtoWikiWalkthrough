@@ -24,14 +24,13 @@ Responsive shell only — no module chrome of its own.
 
 | Slot | Breakpoint | Use for |
 | --- | --- | --- |
-| `#banner` | Mobile only (≤640px) | Optional strip above the card stack (e.g. "Share feedback" link) |
-| `#mobile` | Mobile only | Stacked **`DashboardModule`** link cards — pass **`to`** on each module |
-| `#primary` | Desktop only | Main column (e.g. Contribute feed) |
-| `#sidebar` | Desktop only | Sidebar stack — omit **`to`** on **`DashboardModule`** for static cards |
+| `#banner` | Mobile skin only | Optional strip above the card stack (e.g. "Share feedback" link) |
+| `#mobile` | Mobile skin only | Stacked **`DashboardModule`** link cards — pass **`to`** on each module |
+| `#primary` | Desktop skin only | Main column (e.g. Contribute feed) |
+| `#sidebar` | Desktop skin only | Sidebar stack — omit **`to`** on **`DashboardModule`** for static cards |
 
-At **≤640px**, `#mobile` + `#banner` show and `#primary` / `#sidebar` hide.
-Above **640px**, the two-column grid (`primary` ~66% + `sidebar` ~34%) shows
-and the mobile regions hide.
+When an ancestor sets **`data-skin="mobile"`** (viewport **&lt;640px** or **`skin="mobile"`** on **`ChromeWrapper`**), `#mobile` + `#banner` show and `#primary` / `#sidebar` hide.
+With **`data-skin="desktop"`**, the two-column grid (`primary` ~66% + `sidebar` ~34%) shows and the mobile regions hide — including viewports just above **640px** where **`SpecialPageWrapper`** padding narrows the content column.
 
 Utility classes from the component stylesheet:
 
@@ -53,6 +52,7 @@ Single module box — **link card** when **`to`** is set, **static sidebar card*
 | `title` | `string` | `undefined` | Module heading row; omitted when empty after trim |
 | `to` | `RouteLocationRaw` | `undefined` | When set → mobile-style tappable **`RouterLink`** card (title, arrow, body, optional CTA). When omitted → desktop **`section.sidebar-card`** |
 | `cta` | `string \| null` | `''` | Bottom blue strip label when **`to`** is set. **`null`** hides the strip. **`''`** keeps the strip for a custom **`#cta`** slot |
+| `subtle` | `boolean` | `false` | Tinted **`--background-color-progressive-subtle`** shell (e.g. suggested-edits module) |
 
 ### Slots
 
@@ -79,9 +79,10 @@ The same module often appears twice in a **`Dashboard`** — once in **`#mobile`
 </template>
 ```
 
-Richer modules (mentor, impact, help) can be extracted as co-located
-`*Module.vue` files in the prototype folder that wrap **`DashboardModule`**.
-Only **`index.vue`** becomes a route — see [`protowiki-create-prototype`](../../protowiki-create-prototype/SKILL.md).
+Richer modules (mentor, impact, help, structured tasks) can be extracted as
+co-located `*Module.vue` files in the prototype folder that wrap
+**`DashboardModule`**. **`template-homepage/StructuredTasksModule.vue`** swaps mobile vs desktop variants with the same **`data-skin`** rules as **`Dashboard`**; the desktop variant is a stub for now. Only
+**`index.vue`** becomes a route — see [`protowiki-create-prototype`](../../protowiki-create-prototype/SKILL.md).
 
 ### Example
 

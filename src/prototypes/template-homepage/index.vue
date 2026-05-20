@@ -11,14 +11,26 @@ import { configUserPageTitle } from '@/lib/config'
 import HelpModule from './HelpModule.vue'
 import ImpactModule from './ImpactModule.vue'
 import MentorModule from './MentorModule.vue'
-import { APP_HOME, HELP_LINKS, IMPACT, IMPACT_DESKTOP, MENTOR, MODULE } from './dashpage-fixtures'
+import StructuredTasksModule from './StructuredTasksModule.vue'
+import {
+  APP_HOME,
+  HELP_LINKS,
+  HELP_MODULE,
+  HELP_PAGE,
+  IMPACT,
+  IMPACT_DESKTOP,
+  IMPACT_PAGE,
+  MENTOR,
+  MENTOR_PAGE,
+  STRUCTURED_TASKS,
+} from './dashpage-fixtures'
 
 const { user } = useConfig()
 
 const showLoggedInModules = computed(() => user.value !== 'logged-out')
 
 const impactMobileProps = computed(() =>
-  user.value === 'experienced' ? { to: APP_HOME, ...IMPACT } : { to: APP_HOME },
+  user.value === 'experienced' ? { to: IMPACT_PAGE, ...IMPACT } : { to: IMPACT_PAGE },
 )
 
 const impactDesktopProps = computed(() =>
@@ -47,39 +59,35 @@ definePage({
           </template>
 
           <template #mobile>
-            <DashboardModule
+            <StructuredTasksModule
               class="dashboard-slot--mobile-primary"
               :to="APP_HOME"
-              :title="MODULE.thankTitle"
-              cta="Open module"
-            >
-              <p class="prototype-dashpage-placeholder">{{ MODULE.thankBody }}</p>
-            </DashboardModule>
+              v-bind="STRUCTURED_TASKS"
+            />
 
             <ImpactModule v-if="showLoggedInModules" v-bind="impactMobileProps" />
 
             <MentorModule
               v-if="showLoggedInModules"
+              compact
+              :to="MENTOR_PAGE"
               :mentor-name="MENTOR.name"
               :edit-count="MENTOR.editCount"
               :last-active-days-ago="MENTOR.lastActiveDaysAgo"
               :mentor-note="MENTOR.note"
-              :to="APP_HOME"
               :learn-more-href="MENTOR.learnMoreHref"
               :conversations-href="MENTOR.conversationsHref"
             />
 
-            <DashboardModule :to="APP_HOME" :title="MODULE.policiesTitle" :cta="null">
-              <p class="prototype-dashpage-placeholder">{{ MODULE.policiesBody }}</p>
-            </DashboardModule>
-
-            <HelpModule compact :to="APP_HOME" />
+            <HelpModule compact :to="HELP_PAGE" v-bind="HELP_MODULE" />
           </template>
 
           <template #primary>
-            <DashboardModule :title="MODULE.thankTitle">
-              <p class="prototype-dashpage-placeholder">{{ MODULE.thankBody }}</p>
-            </DashboardModule>
+            <StructuredTasksModule
+              class="dashboard-slot--desktop-primary"
+              :to="APP_HOME"
+              v-bind="STRUCTURED_TASKS"
+            />
           </template>
 
           <template #sidebar>
@@ -95,13 +103,6 @@ definePage({
               :conversations-href="MENTOR.conversationsHref"
             />
 
-            <DashboardModule
-              class="dashboard-slot--desktop-secondary"
-              :title="MODULE.policiesTitle"
-            >
-              <p class="prototype-dashpage-placeholder">{{ MODULE.policiesBody }}</p>
-            </DashboardModule>
-
             <HelpModule :help-links="HELP_LINKS" view-more-href="#" />
           </template>
         </Dashboard>
@@ -115,13 +116,6 @@ definePage({
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
-}
-
-.prototype-dashpage-placeholder {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.4;
-  color: var(--color-base--subtle, #54595d);
 }
 
 :deep(.dashboard-slot--mobile-primary .dashboard-module__body) {

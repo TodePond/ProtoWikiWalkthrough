@@ -76,7 +76,7 @@ no other file needs to change.
 | Newcomer homepage / dashboard | `<ChromeWrapper :last-edited-notice="false"><SpecialPageWrapper title="Dashboard" help><Dashboard>…</Dashboard></SpecialPageWrapper></ChromeWrapper>` — starter: **`template-dashboard/`**; full modules: **`template-homepage/`** |
 | Bare canvas with chrome | `<ChromeWrapper>…</ChromeWrapper>` |
 | A/B preview, two themes side by side | Two `<ChromeWrapper>`s, one `theme="light"`, one `theme="dark"` |
-| Mobile preview embedded in a desktop page | `<ChromeWrapper skin="mobile" style="max-width: 360px">…</ChromeWrapper>` |
+| Mobile preview embedded in a desktop page | `<MobileWrapper><ChromeWrapper skin="mobile">…</ChromeWrapper></MobileWrapper>` |
 
 See [`protowiki-components`](../protowiki-components/SKILL.md) for full
 component docs and [`protowiki-components/references/composition-recipes.md`](../protowiki-components/references/composition-recipes.md)
@@ -88,7 +88,10 @@ for more recipes.
   generates the route table. Only `**/index` files under `src/prototypes/` are
   routes; other co-located `.vue` files (e.g. `HelpModule.vue`) are normal imports.
 - **No gallery edit.** `src/prototypes/index.vue` iterates over the typed route
-  table at runtime; new folders appear automatically.
+  table at runtime; new top-level folders appear automatically. Only
+  `src/prototypes/<name>/index.vue` shows on the gallery — nested
+  `src/prototypes/<proto>/<sub>/index.vue` routes are registered but listed
+  only when linked from inside a prototype (e.g. mobile drill-down pages).
 - **No skin/theme setup.** `<html data-skin>` / `<html data-theme>` are set
   at boot from URL params + viewport + `prefers-color-scheme`. Codex tokens
   cascade through.
@@ -107,7 +110,9 @@ See [`protowiki-deploy`](../protowiki-deploy/SKILL.md).
 The conventions exist to keep the gallery uniform and the file tree
 predictable. Break them when the prototype is genuinely different — e.g.,
 nested routes (`/edit-check/step-1`, `/edit-check/step-2`) live as
-`src/prototypes/edit-check/step-1.vue` etc., and a folder-level layout file can
-sit at `src/prototypes/edit-check/index.vue` if there's a shared shell. Keep the
-home-gallery friendly: still set `meta.title` / `meta.description` on each
-leaf prototype.
+`src/prototypes/edit-check/step-1/index.vue` etc. (any `**/index` under
+`src/prototypes/`), and a folder-level layout file can sit at
+`src/prototypes/edit-check/index.vue` if there's a shared shell. Nested
+`index.vue` files do not appear on the home gallery — only the prototype root
+does. Still set `meta.title` / `meta.description` on nested routes when useful
+for devtools or direct URLs.

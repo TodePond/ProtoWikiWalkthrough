@@ -19,12 +19,15 @@ interface Props {
    * **`''`** keeps the strip for a custom **`#cta`** slot without default button text.
    */
   cta?: string | null
+  /** Light blue informational tint (**`--background-color-progressive-subtle`**). */
+  subtle?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   title: undefined,
   to: undefined,
   cta: '',
+  subtle: false,
 })
 
 /** Resolves **`to`** for **`RouterLink`**; plain **string** targets are trimmed (whitespace-only → no link card). */
@@ -54,6 +57,7 @@ function trimmedTitle(): string {
     v-if="linkCard"
     :to="linkCard.to"
     class="mobile-card mobile-card--link dashboard-module dashboard-slot"
+    :class="{ 'dashboard-module--subtle': props.subtle }"
   >
     <div v-if="trimmedTitle()" class="mobile-card__header">
       <span class="mobile-card__title">{{ trimmedTitle() }}</span>
@@ -69,7 +73,11 @@ function trimmedTitle(): string {
     </slot>
   </RouterLink>
 
-  <section v-else class="sidebar-card dashboard-module dashboard-slot">
+  <section
+    v-else
+    class="sidebar-card dashboard-module dashboard-slot"
+    :class="{ 'dashboard-module--subtle': props.subtle }"
+  >
     <div v-if="trimmedTitle()" class="sidebar-card__title">
       {{ trimmedTitle() }}
     </div>
@@ -107,6 +115,16 @@ function trimmedTitle(): string {
   background-color: var(--background-color-interactive, #eaecf0);
   text-decoration: none;
   color: inherit;
+}
+
+.dashboard-module--subtle.mobile-card,
+.dashboard-module--subtle.sidebar-card {
+  background-color: var(--background-color-progressive-subtle, #e8eeff);
+}
+
+.dashboard-module--subtle.mobile-card--link:hover,
+.dashboard-module--subtle.mobile-card--link:focus {
+  background-color: var(--background-color-progressive-subtle--hover, #d9e2ff);
 }
 
 .mobile-card__header {

@@ -111,10 +111,15 @@ Special pages usually **omit** the mock last-edited notice (desktop block **and*
 ## Mobile preview embedded in a desktop page
 
 ```vue
-<ChromeWrapper skin="mobile" style="max-width: 360px">
-  <ArticleLive article="Albert Einstein" />
-</ChromeWrapper>
+<MobileWrapper>
+  <ChromeWrapper skin="mobile">
+    <ArticleLive article="Albert Einstein" />
+  </ChromeWrapper>
+</MobileWrapper>
 ```
+
+`MobileWrapper` centres a **360px** column on viewports **≥480px** and shows
+**`--background-color-neutral`** side gutters; below **480px** the slot is full width. Pair with **`ChromeWrapper skin="mobile"`** so **`Dashboard`** (and similar layouts keyed on **`data-skin`**) activate their mobile slots inside the narrow column.
 
 ## Edit-suggestion flow
 
@@ -179,7 +184,8 @@ responsive grid and **`DashboardModule`** for each box.
 ```
 
 - **Starter:** **`src/prototypes/template-dashboard/`** — inline placeholder modules
-- **Full example:** **`src/prototypes/template-homepage/`** — co-located `HelpModule.vue`, `ImpactModule.vue`, `MentorModule.vue`, plus **`dashpage-fixtures.ts`**
+- **Full example:** **`src/prototypes/template-homepage/`** — co-located `HelpModule.vue`, `ImpactModule.vue`, `MentorModule.vue`, `StructuredTasksModule.vue`, plus **`dashpage-fixtures.ts`**
+- **Mobile drill-downs:** tap a homepage card (`to: IMPACT_PAGE` / `HELP_PAGE` / `MENTOR_PAGE`) → nested **`impact/`**, **`help/`**, or **`mentor/index.vue`** with **`MobileSubpageHeader`** (optional **`#actions`** menu) + module **`standalone`** body (full layout, bleeds to top/sides).
 
 See [`dashboard.md`](dashboard.md) for slot/prop detail. **`SpecialPageWrapper` `help`** is the title-row Help link — not the same as dashpage's **`HelpModule`** card.
 
