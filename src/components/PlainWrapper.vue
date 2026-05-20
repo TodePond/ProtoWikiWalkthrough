@@ -5,8 +5,9 @@ import { computed, useSlots } from 'vue'
  * Minimal centred column — FakeMediaWiki “Component” wrapper parity:
  * no Wikipedia chrome, max-width + horizontal padding only.
  *
- * Primary reader-style heading is emitted as `<h1 class="mw-first-heading">`.
+ * Primary reader-style heading is a `<header>` with `<h1 class="mw-first-heading">`.
  * Pass `heading` for plain text or `#heading` for rich markup inside that `h1`.
+ * Optional `#actions` slot renders inside the same `<header>` (e.g. toolbar controls).
  */
 interface Props {
   /** BCP-47 language tag on the root (optional). */
@@ -36,20 +37,32 @@ const showHeading = computed(() => {
 </script>
 
 <template>
-  <div class="plain-wrapper" :lang="props.lang" :dir="props.dir">
+  <main class="plain-wrapper" :lang="props.lang" :dir="props.dir">
     <h1 v-if="showHeading" class="mw-first-heading">
       <slot name="heading">{{ props.heading }}</slot>
+      <div v-if="slots.actions" class="plain-wrapper__header-actions">
+        <slot name="actions" />
+      </div>
     </h1>
     <slot />
-  </div>
+  </main>
 </template>
 
 <style scoped>
-.plain-wrapper {
+main {
   box-sizing: border-box;
   max-width: 45rem;
   margin: 0 auto;
   padding: var(--spacing-250) var(--spacing-100);
   background-color: var(--background-color-base);
+}
+
+h1 {
+  display: flex;
+  justify-content: space-between;
+}
+
+.plain-wrapper__header-actions {
+  font-family: var(--font-family-system-sans);
 }
 </style>

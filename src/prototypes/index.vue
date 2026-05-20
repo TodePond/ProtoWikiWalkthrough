@@ -6,10 +6,11 @@ definePage({
   },
 })
 
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { CdxCard } from '@wikimedia/codex'
+import { CdxButton, CdxCard, CdxIcon, CdxPopover, CdxSelect } from '@wikimedia/codex'
+import { cdxIconSettings } from '@wikimedia/codex-icons'
 
 import PlainWrapper from '@/components/PlainWrapper.vue'
 
@@ -85,11 +86,48 @@ const templateAndExamplePrototypes = computed(() =>
 const showBucketDivider = computed(
   () => regularPrototypes.value.length > 0 && templateAndExamplePrototypes.value.length > 0,
 )
+
+const settingsOpen = ref(false)
+const settingsAnchor = ref<HTMLElement | null>(null)
+const settingsChoice = ref<string | null>(null)
+
+const settingsMenuItems = [
+  { value: 'a', label: 'Option A' },
+  { value: 'b', label: 'Option B' },
+]
 </script>
 
 <template>
   <!--  -->
   <PlainWrapper heading="ProtoWiki">
+    <template #actions>
+      <span ref="settingsAnchor">
+        <CdxButton
+          weight="quiet"
+          :icon-only="true"
+          aria-label="Settings"
+          :aria-expanded="settingsOpen"
+          @click="settingsOpen = !settingsOpen"
+        >
+          <CdxIcon :icon="cdxIconSettings" />
+        </CdxButton>
+      </span>
+      <CdxPopover
+        v-model:open="settingsOpen"
+        :anchor="settingsAnchor"
+        placement="bottom-end"
+        render-in-place
+        class="prototype-index__settings-popover"
+      >
+        <div class="prototype-index__settings-panel" @click.stop>
+          <CdxSelect
+            v-model:selected="settingsChoice"
+            :menu-items="settingsMenuItems"
+            default-label="Choose an option"
+          />
+        </div>
+      </CdxPopover>
+    </template>
     <div class="prototype-index">
       <div class="prototype-index__list">
         <div v-for="entry in regularPrototypes" :key="entry.path" class="prototype-index__card">
@@ -131,5 +169,12 @@ const showBucketDivider = computed(
   margin: var(--spacing-50) 0;
   border: 0;
   border-top: 1px solid var(--border-color-subtle);
+}
+</style>
+
+<!-- Popover is teleported; allow the select menu to extend past the scrollable body. -->
+<style>
+.prototype-index__settings-popover .cdx-popover__body {
+  overflow: visible;
 }
 </style>
