@@ -7,6 +7,7 @@ import Dashboard from '@/components/Dashboard.vue'
 import DashboardModule from '@/components/DashboardModule.vue'
 import SpecialPageWrapper from '@/components/SpecialPageWrapper.vue'
 import { useConfig } from '@/composables/useConfig'
+import { configUserPageTitle } from '@/lib/config'
 import HelpModule from './HelpModule.vue'
 import ImpactModule from './ImpactModule.vue'
 import MentorModule from './MentorModule.vue'
@@ -24,6 +25,8 @@ const impactDesktopProps = computed(() =>
   user.value === 'experienced' ? IMPACT_DESKTOP : {},
 )
 
+const pageTitle = computed(() => configUserPageTitle(user.value))
+
 definePage({
   meta: {
     title: 'Template: Homepage',
@@ -34,7 +37,7 @@ definePage({
 
 <template>
   <ChromeWrapper :last-edited-notice="false">
-    <SpecialPageWrapper title="Hello, Username!" help>
+    <SpecialPageWrapper :title="pageTitle" help>
       <div class="prototype-dashpage-shell">
         <Dashboard>
           <template #banner>

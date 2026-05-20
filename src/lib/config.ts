@@ -11,6 +11,28 @@ export const DEFAULT_CONFIG: Config = {
   user: 'new',
 }
 
+export const CONFIG_USER_DISPLAY_NAMES: Record<ConfigUser, string> = {
+  'logged-out': 'LoggedOut',
+  new: 'NewEditor',
+  experienced: 'ExperiencedEditor',
+}
+
+export const CONFIG_USER_MENU_ITEMS: { value: ConfigUser; label: string }[] = [
+  { value: 'logged-out', label: 'Logged out' },
+  { value: 'new', label: 'New editor' },
+  { value: 'experienced', label: 'Experienced editor' },
+]
+
+export function configUserDisplayName(user: ConfigUser): string {
+  return CONFIG_USER_DISPLAY_NAMES[user]
+}
+
+/** Greeting on newcomer homepage / dashboard special pages. */
+export function configUserPageTitle(user: ConfigUser): string {
+  if (user === 'logged-out') return 'Hello!'
+  return `Hello, ${configUserDisplayName(user)}!`
+}
+
 const STORAGE_KEY = 'protowiki-prototype-user-config'
 
 const VALID_THEMES: ConfigTheme[] = ['light', 'dark', 'system']

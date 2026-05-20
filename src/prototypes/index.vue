@@ -14,6 +14,7 @@ import { cdxIconSettings } from '@wikimedia/codex-icons'
 
 import PlainWrapper from '@/components/PlainWrapper.vue'
 import { useConfig } from '@/composables/useConfig'
+import { CONFIG_USER_MENU_ITEMS } from '@/lib/config'
 
 const router = useRouter()
 const { theme, user } = useConfig()
@@ -98,11 +99,6 @@ const themeMenuItems = [
   { value: 'dark', label: 'Dark' },
 ]
 
-const userMenuItems = [
-  { value: 'logged-out', label: 'Logged out' },
-  { value: 'new', label: 'New editor' },
-  { value: 'experienced', label: 'Experienced editor' },
-]
 </script>
 
 <template>
@@ -140,7 +136,7 @@ const userMenuItems = [
             <span class="prototype-index__settings-label">User</span>
             <CdxSelect
               v-model:selected="user"
-              :menu-items="userMenuItems"
+              :menu-items="CONFIG_USER_MENU_ITEMS"
               default-label="New editor"
             />
           </label>

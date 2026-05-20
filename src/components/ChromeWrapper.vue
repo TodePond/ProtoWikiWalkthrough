@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, provide } from 'vue'
 
+import { useConfig } from '@/composables/useConfig'
 import type { ChromeNavTool } from '@/lib/chromeHeader'
+import { configUserDisplayName } from '@/lib/config'
 import {
   globalSkin,
   globalTheme,
@@ -54,15 +56,20 @@ const props = withDefaults(defineProps<Props>(), {
   skin: undefined,
   theme: undefined,
   lastEditedNotice: true,
-  username: 'Username',
+  username: undefined,
   wordmarkSrc: undefined,
   taglineSrc: undefined,
   mobileWordmarkSrc: undefined,
   navTools: undefined,
 })
 
+const { user } = useConfig()
+
 const effectiveSkin = computed<Skin>(() => props.skin ?? globalSkin.value)
 const effectiveTheme = computed<Theme>(() => props.theme ?? globalTheme.value)
+const effectiveUsername = computed(
+  () => props.username ?? configUserDisplayName(user.value),
+)
 
 provide(PROTOWIKI_CHROME_SKIN, effectiveSkin)
 provide(PROTOWIKI_CHROME_THEME, effectiveTheme)
@@ -80,7 +87,7 @@ provide(PROTOWIKI_CHROME_THEME, effectiveTheme)
       <ChromeHeader
         :skin="effectiveSkin"
         :theme="effectiveTheme"
-        :username="props.username"
+        :username="effectiveUsername"
         :wordmark-src="props.wordmarkSrc"
         :tagline-src="props.taglineSrc"
         :mobile-wordmark-src="props.mobileWordmarkSrc"
@@ -97,7 +104,7 @@ provide(PROTOWIKI_CHROME_THEME, effectiveTheme)
         :skin="effectiveSkin"
         :theme="effectiveTheme"
         :last-edited-notice="props.lastEditedNotice"
-        :username="props.username"
+        :username="effectiveUsername"
       />
     </slot>
   </div>

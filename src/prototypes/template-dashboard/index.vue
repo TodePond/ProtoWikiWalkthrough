@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { CdxIcon } from '@wikimedia/codex'
 import { cdxIconCheck, cdxIconUserTalk } from '@wikimedia/codex-icons'
 import { RouterLink } from 'vue-router'
 
 import ChromeWrapper from '@/components/ChromeWrapper.vue'
+import { useConfig } from '@/composables/useConfig'
+import { configUserPageTitle } from '@/lib/config'
 import Dashboard from '@/components/Dashboard.vue'
 import DashboardModule from '@/components/DashboardModule.vue'
 import SpecialPageWrapper from '@/components/SpecialPageWrapper.vue'
@@ -14,6 +17,10 @@ definePage({
     description: 'Template for dashboard prototypes that contain "box modules".',
   },
 })
+
+const { user } = useConfig()
+
+const pageTitle = computed(() => configUserPageTitle(user.value))
 
 /** Gallery / app home (file-based route `/`). */
 const HOME = '/'
@@ -30,7 +37,7 @@ const MODULE = {
 
 <template>
   <ChromeWrapper :last-edited-notice="false">
-    <SpecialPageWrapper title="Hello, Username!" help>
+    <SpecialPageWrapper :title="pageTitle" help>
       <div class="template-dashboard-shell">
         <Dashboard>
           <template #banner>

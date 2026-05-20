@@ -10,7 +10,7 @@ import ChromeWrapper from '@/components/ChromeWrapper.vue'
 </script>
 
 <template>
-  <ChromeWrapper username="Username">
+  <ChromeWrapper>
     <main>
       <h1>Chrome wrapper</h1>
       <p>Starter template — empty chrome wrapper.</p>

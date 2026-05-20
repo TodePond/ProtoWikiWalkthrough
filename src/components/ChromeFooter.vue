@@ -40,7 +40,7 @@ const effectiveSkin = computed<Skin>(() => props.skin ?? globalSkin.value)
 const effectiveTheme = computed<Theme>(() => props.theme ?? globalTheme.value)
 const isDesktop = computed(() => effectiveSkin.value === 'desktop')
 const showLastEditedMobile = computed(() => props.lastEditedNotice && !isDesktop.value)
-const lastEditedByLabel = computed(() => props.username.trim() || 'Username')
+const lastEditedByLabel = computed(() => (props.username ?? '').trim() || 'Username')
 
 const links = [
   {

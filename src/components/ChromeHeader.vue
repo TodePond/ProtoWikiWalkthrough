@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import { CdxButton, CdxIcon } from '@wikimedia/codex'
+import { CdxButton, CdxIcon, CdxMenuButton } from '@wikimedia/codex'
 import {
   cdxIconAppearance,
   cdxIconBell,
@@ -12,10 +12,14 @@ import {
   cdxIconWatchlist,
 } from '@wikimedia/codex-icons'
 
+import { useConfig } from '@/composables/useConfig'
+import { CONFIG_USER_MENU_ITEMS } from '@/lib/config'
 import { DEFAULT_CHROME_NAV_TOOLS, type ChromeNavTool } from '@/lib/chromeHeader'
 import { globalSkin, globalTheme } from '@/lib/theming'
 import type { Skin, Theme } from '@/lib/theming'
 import SearchBar from './SearchBar.vue'
+
+const { user } = useConfig()
 
 /** Fallback EN CDN SVGs — override via **`wordmarkSrc`** / **`taglineSrc`** / **`mobileWordmarkSrc`**. */
 const WIKIPEDIA_WORDMARK_EN =
@@ -49,7 +53,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   skin: undefined,
   theme: undefined,
-  username: 'Username',
+  username: undefined,
   wordmarkSrc: undefined,
   taglineSrc: undefined,
   mobileWordmarkSrc: undefined,
@@ -60,8 +64,9 @@ const effectiveSkin = computed<Skin>(() => props.skin ?? globalSkin.value)
 const effectiveTheme = computed<Theme>(() => props.theme ?? globalTheme.value)
 const isDesktop = computed(() => effectiveSkin.value === 'desktop')
 const isMobile = computed(() => effectiveSkin.value === 'mobile')
-const trimmedUsername = computed(() => props.username.trim())
+const trimmedUsername = computed(() => (props.username ?? '').trim())
 const showChromeUsernameLink = computed(() => trimmedUsername.value.length > 0)
+const isLoggedOut = computed(() => user.value === 'logged-out')
 
 const desktopWordmarkSrc = computed(() => props.wordmarkSrc ?? WIKIPEDIA_WORDMARK_EN)
 const desktopTaglineSrc = computed(() => props.taglineSrc ?? WIKIPEDIA_TAGLINE_EN)
@@ -142,27 +147,52 @@ function navHas(tool: ChromeNavTool): boolean {
           <CdxIcon :icon="cdxIconSearch" />
         </CdxButton>
         <slot name="username">
-          <a
-            v-if="showChromeUsernameLink"
-            class="chrome-header__username-link"
-            href="https://meta.wikimedia.org/wiki/Main_Page"
-            rel="noopener noreferrer"
+          <div v-if="isLoggedOut" class="chrome-header__logged-out-toolbar">
+            <a
+              class="chrome-header__text-link"
+              href="https://donate.wikimedia.org/"
+              rel="noopener noreferrer"
+            >
+              Donate
+            </a>
+            <CdxMenuButton
+              v-model:selected="user"
+              class="chrome-header__username-menu"
+              weight="quiet"
+              :menu-items="CONFIG_USER_MENU_ITEMS"
+              aria-label="Prototype user"
+            >
+              <span class="chrome-header__text-link">Create account</span>
+            </CdxMenuButton>
+            <a
+              class="chrome-header__text-link"
+              href="https://en.wikipedia.org/w/index.php?title=Special:UserLogin"
+              rel="noopener noreferrer"
+            >
+              Log in
+            </a>
+          </div>
+          <CdxMenuButton
+            v-else-if="showChromeUsernameLink"
+            v-model:selected="user"
+            class="chrome-header__username-menu"
+            weight="quiet"
+            :menu-items="CONFIG_USER_MENU_ITEMS"
+            aria-label="Prototype user"
           >
-            {{ trimmedUsername }}
-          </a>
+            <span class="chrome-header__text-link">{{ trimmedUsername }}</span>
+          </CdxMenuButton>
         </slot>
-        <slot name="nav">
+        <slot v-if="!isLoggedOut" name="nav">
           <CdxButton v-if="navHas('appearance')" weight="quiet" aria-label="Appearance">
             <CdxIcon :icon="cdxIconAppearance" />
           </CdxButton>
           <CdxButton
             v-if="navHas('notifications')"
             weight="quiet"
-            class="chrome-header__notify"
             aria-label="Notifications"
           >
             <CdxIcon :icon="cdxIconBell" />
-            <span class="chrome-header__notify-badge" aria-hidden="true">1</span>
           </CdxButton>
           <CdxButton v-if="navHas('notices')" weight="quiet" aria-label="Notices">
             <CdxIcon :icon="cdxIconTray" />
@@ -217,12 +247,19 @@ function navHas(tool: ChromeNavTool): boolean {
         <CdxButton
           weight="quiet"
           size="large"
-          class="chrome-header__notify"
           aria-label="Notifications"
         >
           <CdxIcon :icon="cdxIconBell" />
-          <span class="chrome-header__notify-badge" aria-hidden="true">1</span>
         </CdxButton>
+        <CdxMenuButton
+          v-model:selected="user"
+          class="chrome-header__mobile-user-menu"
+          weight="quiet"
+          :menu-items="CONFIG_USER_MENU_ITEMS"
+          aria-label="Prototype user"
+        >
+          <CdxIcon :icon="cdxIconUserAvatar" size="large" />
+        </CdxMenuButton>
       </div>
     </nav>
   </header>
@@ -351,20 +388,38 @@ function navHas(tool: ChromeNavTool): boolean {
   margin-inline-start: auto;
 }
 
-.chrome-header[data-skin='desktop']
-  .chrome-header__desktop-end
-  :deep(.chrome-header__username-link) {
-  align-self: center;
-  margin-inline-end: var(--spacing-8, 8px);
-  margin-inline-start: var(--spacing-8, 8px);
+.chrome-header[data-skin='desktop'] .chrome-header__logged-out-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-75, 12px);
+  margin-inline: var(--spacing-8, 8px);
+}
+
+.chrome-header[data-skin='desktop'] .chrome-header__text-link {
   color: var(--color-progressive, #36c);
   font-size: var(--font-size-medium, 1rem);
+  font-weight: normal;
+  line-height: 1.4;
   text-decoration: none;
 }
 
-.chrome-header[data-skin='desktop']
-  .chrome-header__desktop-end
-  :deep(.chrome-header__username-link:hover) {
+.chrome-header[data-skin='desktop'] a.chrome-header__text-link:hover {
+  text-decoration: underline;
+}
+
+.chrome-header[data-skin='desktop'] .chrome-header__username-menu {
+  align-self: center;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+}
+
+.chrome-header[data-skin='desktop'] .chrome-header__username-menu :deep(.cdx-button__indicator) {
+  display: none;
+}
+
+.chrome-header[data-skin='desktop'] .chrome-header__username-menu:hover :deep(.chrome-header__text-link) {
   text-decoration: underline;
 }
 
@@ -374,24 +429,23 @@ function navHas(tool: ChromeNavTool): boolean {
   padding: 0.5rem 0.4rem;
 }
 
-.chrome-header[data-skin='desktop'] .chrome-header__notify {
-  position: relative;
+/* Username menu: plain Meta-style link, not a tool icon button (wins over rule above). */
+.chrome-header[data-skin='desktop'] .chrome-header__username-menu :deep(.cdx-button) {
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  font-weight: normal;
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
-.chrome-header[data-skin='desktop'] .chrome-header__notify-badge {
-  position: absolute;
-  bottom: 2px;
-  right: 0;
-  min-width: 16px;
-  padding: 0 3px;
-  border-radius: 2px;
-  border: 1px solid var(--color-inverted, #fff);
-  background-color: var(--background-color-progressive, #36c);
-  color: var(--color-inverted, #fff);
-  font-size: var(--font-size-x-small, 0.75rem);
-  font-weight: var(--font-weight-bold, 700);
-  line-height: 1;
-  text-align: center;
+.chrome-header[data-skin='desktop'] .chrome-header__username-menu :deep(.cdx-button:hover),
+.chrome-header[data-skin='desktop'] .chrome-header__username-menu :deep(.cdx-button:active),
+.chrome-header[data-skin='desktop'] .chrome-header__username-menu :deep(.cdx-button--is-active),
+.chrome-header[data-skin='desktop'] .chrome-header__username-menu :deep(.cdx-button:focus) {
+  background-color: transparent;
+  box-shadow: none;
 }
 
 .chrome-header[data-skin='desktop'] .chrome-header__dropdown-chevron {
@@ -438,10 +492,6 @@ function navHas(tool: ChromeNavTool): boolean {
     padding: 0.45rem 0.5rem;
   }
 
-  .chrome-header[data-skin='desktop'] .chrome-header__notify-badge {
-    bottom: 8px;
-    right: 4px;
-  }
 }
 
 @media (max-width: 768px) {
@@ -501,29 +551,29 @@ function navHas(tool: ChromeNavTool): boolean {
   margin-inline-start: auto;
 }
 
-/* Let Codex `size="large"` icon buttons keep default min sizes — avoid squishing. */
-.chrome-header[data-skin='mobile'] .chrome-header__mobile-actions .cdx-button {
+/* Equal square touch targets for search, notifications, and user (Minerva parity). */
+.chrome-header[data-skin='mobile'] .chrome-header__mobile-actions .cdx-button,
+.chrome-header[data-skin='mobile'] .chrome-header__mobile-user-menu :deep(.cdx-button) {
+  box-sizing: border-box;
   flex-shrink: 0;
+  width: var(--size-icon-large, 40px);
+  min-width: var(--size-icon-large, 40px);
+  max-width: var(--size-icon-large, 40px);
+  height: var(--size-icon-large, 40px);
+  min-height: var(--size-icon-large, 40px);
+  padding: 0;
   color: var(--color-subtle, #54595d);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.chrome-header[data-skin='mobile'] .chrome-header__notify {
-  position: relative;
+.chrome-header[data-skin='mobile'] .chrome-header__mobile-user-menu {
+  flex-shrink: 0;
+  width: var(--size-icon-large, 40px);
 }
 
-.chrome-header[data-skin='mobile'] .chrome-header__notify-badge {
-  position: absolute;
-  bottom: 2px;
-  right: 0;
-  min-width: 16px;
-  padding: 0 3px;
-  border-radius: 2px;
-  border: 1px solid var(--color-inverted, #fff);
-  background-color: var(--background-color-progressive, #36c);
-  color: var(--color-inverted, #fff);
-  font-size: var(--font-size-x-small, 0.75rem);
-  font-weight: var(--font-weight-bold, 700);
-  line-height: 1;
-  text-align: center;
+.chrome-header[data-skin='mobile'] .chrome-header__mobile-user-menu :deep(.cdx-button__indicator) {
+  display: none;
 }
 </style>
