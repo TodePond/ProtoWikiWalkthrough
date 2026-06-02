@@ -10,8 +10,8 @@ import {
   cdxIconLanguage,
   cdxIconSearch,
   cdxIconSettings,
-  cdxIconStar,
-  cdxIconUnStar,
+  cdxIconBookmark,
+  cdxIconBookmarkOutline,
 } from '@wikimedia/codex-icons'
 
 import {
@@ -71,6 +71,9 @@ const emit = defineEmits<{
 const langMenuOpen = ref(false)
 const langSearch = ref('')
 const langAnchor = ref<HTMLElement | null>(null)
+
+const bookmarkPopoverOpen = ref(false)
+const bookmarkAnchor = ref<HTMLElement | null>(null)
 
 const filteredLanguageLinks = computed(() => {
   const q = langSearch.value.trim().toLowerCase()
@@ -145,14 +148,16 @@ function onLanguagePick(row: ArticleLanguageLink) {
         <a href="#" class="article-header__action" @click.prevent="$emit('historyClick')">
           View history
         </a>
-        <CdxButton
-          class="article-header__icon-btn"
-          weight="quiet"
-          aria-label="Watch"
-          @click="$emit('bookmarkClick')"
-        >
-          <CdxIcon :icon="cdxIconUnStar" />
-        </CdxButton>
+        <span ref="bookmarkAnchor">
+          <CdxButton
+            class="article-header__icon-btn"
+            weight="quiet"
+            aria-label="Save page"
+            @click="isLoggedOut ? (bookmarkPopoverOpen = !bookmarkPopoverOpen) : $emit('bookmarkClick')"
+          >
+            <CdxIcon :icon="cdxIconBookmarkOutline" />
+          </CdxButton>
+        </span>
       </nav>
     </div>
 
@@ -184,12 +189,13 @@ function onLanguagePick(row: ArticleLanguageLink) {
           <CdxIcon :icon="cdxIconDownload" />
         </button>
         <button
+          ref="bookmarkAnchor"
           type="button"
           class="article-header__icon-tool"
-          aria-label="Watch"
-          @click="$emit('bookmarkClick')"
+          aria-label="Save page"
+          @click="bookmarkPopoverOpen = !bookmarkPopoverOpen"
         >
-          <CdxIcon :icon="cdxIconStar" />
+          <CdxIcon :icon="cdxIconBookmarkOutline" />
         </button>
         <button
           type="button"
@@ -204,10 +210,10 @@ function onLanguagePick(row: ArticleLanguageLink) {
         <button
           type="button"
           class="article-header__icon-tool"
-          aria-label="Watch"
+          aria-label="Save page"
           @click="$emit('bookmarkClick')"
         >
-          <CdxIcon :icon="cdxIconUnStar" />
+          <CdxIcon :icon="cdxIconBookmark" />
         </button>
         <button
           type="button"
@@ -277,6 +283,21 @@ function onLanguagePick(row: ArticleLanguageLink) {
             <CdxIcon :icon="cdxIconSettings" />
           </CdxButton>
         </div>
+      </div>
+    </CdxPopover>
+
+    <CdxPopover
+      v-model:open="bookmarkPopoverOpen"
+      :anchor="bookmarkAnchor"
+      placement="bottom-end"
+      render-in-place
+      class="article-header__bookmark-popover"
+    >
+      <div class="article-header__bookmark-panel" @click.stop>
+        <p class="article-header__bookmark-title">Save page</p>
+        <p class="article-header__bookmark-body">Log in or create an account to save pages to your personal list.</p>
+        <CdxButton weight="normal" class="article-header__bookmark-btn">Log in</CdxButton>
+        <CdxButton weight="primary" action="progressive" class="article-header__bookmark-btn">Create an account</CdxButton>
       </div>
     </CdxPopover>
 
@@ -540,6 +561,40 @@ function onLanguagePick(row: ArticleLanguageLink) {
 .article-header[data-skin='mobile'] .article-header__tab:hover {
   color: var(--color-subtle);
   text-decoration: none;
+}
+
+.article-header__bookmark-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-50, 8px);
+  min-width: 240px;
+  padding: var(--spacing-25, 4px) 0;
+}
+
+.article-header__bookmark-popover :deep(.cdx-popover),
+.article-header__bookmark-popover :deep(.cdx-popover__arrow) {
+  background-color: #eaf3ff !important;
+  border-color: #c8d8f5 !important;
+}
+
+.article-header__bookmark-title {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-medium, 16px);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-base);
+}
+
+.article-header__bookmark-body {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-small, 14px);
+  color: var(--color-base);
+}
+
+.article-header__bookmark-btn {
+  width: 100%;
+  justify-content: center;
 }
 
 .article-header[data-skin='mobile'] .article-header__tab--active {
