@@ -43,7 +43,7 @@ Lists of APIs you can use within prototypes.
 
 _Either follow these instructions, or ask an AI agent to follow them for you!_
 
-To run ProtoWiki locally, clone this repo or fork it to use it as a template.
+To run ProtoWiki locally, fork this repo and clone your fork.
 
 Then install dependencies and run the dev server:
 
@@ -54,16 +54,6 @@ npm run dev
 
 Then open [localhost:5173](https://localhost:5173) in your browser.
 
-You do not need `npm run build` for local prototyping — CI builds when you push.
-
-### Deploying and PR previews
-
-Production: [wikimedia.github.io/ProtoWiki](https://wikimedia.github.io/ProtoWiki) (push to `main`).
-
-**PR previews** deploy to GitHub Pages automatically when you open a pull request **in your fork** (e.g. `feature` → `main` on `youruser/ProtoWiki`). One-time on the fork: enable **Pages → Deploy from branch → `gh-pages`**, and **Actions → Read and write** permissions. The preview URL is posted as a comment on the PR.
-
-Full steps, fork setup, and troubleshooting: [`.agents/skills/protowiki-deploy/SKILL.md`](.agents/skills/protowiki-deploy/SKILL.md).
-
 ### Creating a prototype
 
 1. Make a new folder in the `prototypes` folder.
@@ -73,6 +63,17 @@ Full steps, fork setup, and troubleshooting: [`.agents/skills/protowiki-deploy/S
 I recommend copying one of the `template-*` prototypes as a starting point. For example, copy+paste `template-chrome`, give it a new folder name, and change its title and description inside its `index.vue` file. For **article HTML you write yourself** in Vue (infobox + sections, no live fetch or snapshot file), use **`template-article-custom`** as the reference — see [`.agents/skills/protowiki-components/references/article.md`](.agents/skills/protowiki-components/references/article.md). For **dashboard / newcomer homepage** layouts, use **`template-dashboard`** (minimal module boxes) or **`template-homepage`** (mentor, impact, and help modules).
 
 Trouble-shooting: If it doesn't appear at first or you see a blank screeen, try restarting the dev server. If you don't know how to do this, ask a friendly human or AI agent to help you.
+
+### Deploying a prototype
+
+ProtoWiki gets deployed when you commit to the `main` branch.\
+It's available at `[your-username].github.io/[your-fork-name]`\
+For example: [wikimedia.github.io/ProtoWiki](https://wikimedia.github.io/ProtoWiki).\
+You might need to enable actions within the actions tab of your repo to get this to work.
+
+Alternatively, when you create a pull request, a preview gets deployed. Here's an [example](https://github.com/wikimedia/ProtoWiki/pull/3#issuecomment-4488446669).\
+This is great because it also creates a QR code that people can use to try the prototype on their phone.\
+To be able to create a pull request, make sure you're working in a fork of this repo.
 
 ## Questions? Thoughts?
 
