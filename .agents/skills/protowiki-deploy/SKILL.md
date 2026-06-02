@@ -1,6 +1,6 @@
 ---
 name: protowiki-deploy
-description: How to build and deploy ProtoWiki to GitHub Pages — production deploy, PR preview deployments on gh-pages, fork setup, base path (PROTOWIKI_BASE), SPA 404 fallback, and CI workflows. Use when asked to deploy, publish, preview a PR, ship to GitHub Pages, set up a fork, or fix base-path / 404 issues.
+description: How to build and deploy ProtoWiki to GitHub Pages — production deploy, PR preview deployments on gh-pages, template-first repo setup, base path (PROTOWIKI_BASE), SPA 404 fallback, and CI workflows. Use when asked to deploy, publish, preview a PR, ship to GitHub Pages, set up a copied repo, or fix base-path / 404 issues.
 license: MIT
 ---
 
@@ -11,13 +11,24 @@ pull requests — you rarely need `npm run build` locally. For day-to-day
 prototyping, use `npm run dev` (see
 [`protowiki-getting-started`](../protowiki-getting-started/SKILL.md)).
 
+## Golden path (template-first)
+
+Default recommendation for designers/PMs:
+
+1. Use `wikimedia/ProtoWiki` as a **template** (copy into your own repo).
+2. Build locally with `npm run dev`.
+3. Push to `main` in your copied repo to deploy production.
+4. Use branch + PR previews only when you want parallel in-progress links or review.
+
+Do not require a fork or upstream write access for the standard deploy flow.
+
 ## Local dev vs production build
 
-| Command | When |
-| --- | --- |
-| `npm run dev` | **Default** — HMR at `http://localhost:5173`, Vite `base: '/'`. |
-| `npm run build` | **Optional** — CI runs this. Locally only to reproduce Pages or debug deploy issues. |
-| `npm run preview` | **After** a local build — serves `dist/` with the same base path as the build. |
+| Command           | When                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------ |
+| `npm run dev`     | **Default** — HMR at `http://localhost:5173`, Vite `base: '/'`.                      |
+| `npm run build`   | **Optional** — CI runs this. Locally only to reproduce Pages or debug deploy issues. |
+| `npm run preview` | **After** a local build — serves `dist/` with the same base path as the build.       |
 
 ## Reproducing GitHub Pages locally
 
@@ -60,11 +71,11 @@ PROTOWIKI_BASE='/ProtoWiki/pr-preview/pr-42/' npm run build   # PR preview
 PROTOWIKI_BASE='/' npm run build                              # custom domain at root
 ```
 
-## GitHub Pages setup (one-time per repo or fork)
+## GitHub Pages setup (one-time per deployed repo)
 
-| Setting | Value |
-| --- | --- |
-| **Pages source** | **Deploy from a branch** → `gh-pages` / `/ (root)` |
+| Setting                 | Value                                                                        |
+| ----------------------- | ---------------------------------------------------------------------------- |
+| **Pages source**        | **Deploy from a branch** → `gh-pages` / `/ (root)`                           |
 | **Actions permissions** | **Settings → Actions → General → Workflow permissions** → **Read and write** |
 
 Do **not** use the Pages option labeled **“GitHub Actions”** for this repo —
@@ -118,19 +129,63 @@ changes without deploying `main` leaves deep links broken until the next product
 deploy. Hard-refreshing a preview deep URL briefly hops through the gallery (no
 server-side SPA rewrite on GitHub Pages).
 
-### Fork contributors
+### Deploy path decision tree
 
-Fork `wikimedia/ProtoWiki`, complete [GitHub Pages setup](#github-pages-setup-one-time-per-repo-or-fork)
-on **your fork**, push to `main` once, then open PRs **within your fork**
-(e.g. `feature` → `main` on `youruser/ProtoWiki`). Previews appear on **your**
-`github.io` site — no extra accounts or secrets.
+Use this three-way decision:
 
-### Cross-repo PRs to upstream
+1. **Template/new repo (default):**
+   - Push to `main` for production deploy.
+   - For preview links, push your changes to a **separate branch** and open a
+     pull request from that branch to `main` in the same repo
+     (`pr-preview/pr-<number>/`).
+2. **Upstream collaborator (`wikimedia/ProtoWiki` write access):**
+   - Optional maintainer flow: branch in upstream and open PR to `main`.
+3. **No GitHub account yet:**
+   - Prototype locally now; create account/repo only when ready to deploy.
+   - Agent can guide UI + commands without owning GitHub credentials.
 
-PRs from `alice/ProtoWiki` **into** `wikimedia/ProtoWiki` do **not** get
-automatic upstream previews (untrusted code must not write to upstream
-`gh-pages`). **Preview in your fork first**, then open the upstream PR and
-link your fork preview in the description.
+### Agent deploy playbook (automated vs guided)
+
+At deploy time, always declare capability mode first:
+
+- **Automated mode:** "I can do this for you end-to-end."
+- **Guided mode:** "I cannot access GitHub here; I will guide you step-by-step."
+
+Then run:
+
+1. Confirm destination repo (`your copy` by default; upstream only if requested and permitted).
+2. Confirm deploy intent:
+   - `main` push for production update, or
+   - separate branch + pull request for preview.
+   - Never use a direct `main` push when the user asked for a preview link.
+3. Check prerequisites:
+   - repo exists,
+   - Actions workflow permissions are read/write,
+   - Pages source is `gh-pages` branch root.
+4. Execute (automated) or provide one copy/paste command block at a time (guided).
+5. Return final URL(s): production and/or PR preview.
+
+### Guided mode communication style (non-technical users)
+
+When guiding designers/PMs, prefer plain language over Git jargon:
+
+- Say "your project copy" instead of "fork/upstream remote" unless needed.
+- Say "make a new branch to test an idea" instead of "create a feature branch".
+- Always say "pull request" in full (do not shorten to "PR").
+- Say "deploy your prototype" instead of "deploy to GitHub Pages" when context is clear.
+- Give one action at a time with an explicit success check ("Paste the link you see").
+- Avoid unexplained terms like "rebase", "upstream", "HEAD", "origin", "detached", "CI".
+
+Use this sentence starter in guided mode:
+"I'll walk you through this step-by-step."
+
+### Workflow coverage matrix
+
+| Scenario                                   | Workflow                                                | Result                                                                                                           |
+| ------------------------------------------ | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Push to `main` in any ProtoWiki-based repo | [`deploy.yml`](../../../.github/workflows/deploy.yml)   | Updates production site root                                                                                     |
+| PR inside same repo                        | [`preview.yml`](../../../.github/workflows/preview.yml) | Creates/removes `pr-preview/pr-<number>/`                                                                        |
+| External fork PR into upstream             | Not enabled by default in this strategy                 | Use template-first repo previews; upstream path is collaborator-only unless extra fork-preview workflow is added |
 
 ## Custom domain
 

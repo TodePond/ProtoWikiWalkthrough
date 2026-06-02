@@ -43,7 +43,7 @@ Lists of APIs you can use within prototypes.
 
 _Either follow these instructions, or ask an AI agent to follow them for you!_
 
-To run ProtoWiki locally, fork this repo and clone your fork.
+To run ProtoWiki locally, use this repo as a template (or make your own copy), then clone your repo.
 
 Then install dependencies and run the dev server:
 
@@ -72,8 +72,7 @@ For example: [wikimedia.github.io/ProtoWiki](https://wikimedia.github.io/ProtoWi
 You might need to enable actions within the actions tab of your repo to get this to work.
 
 Alternatively, when you create a pull request on your fork, a preview gets deployed. Here's an [example](https://github.com/wikimedia/ProtoWiki/pull/3#issuecomment-4488446669).\
-This is great because it also creates a QR code that people can use to try the prototype on their phone.\
-To be able to create a pull request, make sure you're working in a fork of this repo.
+This is great because it also creates a QR code that people can use to try the prototype on their phone.
 
 ## Questions? Thoughts?
 
